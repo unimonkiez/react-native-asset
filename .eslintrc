@@ -1,0 +1,29 @@
+{
+  "root": true,
+  "extends": "airbnb-base",
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "import/no-extraneous-dependencies": [
+      2,
+      {
+        "devDependencies": true,
+        "optionalDependencies": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "*.test.js",
+        "*.spec.js",
+        "*.test.jsx",
+        "*.spec.jsx"
+      ],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
+}

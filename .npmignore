@@ -1,0 +1,11 @@
+node_modules/
+.editorconfig
+.eslintrc
+.gitignore
+yarn.lock
+.travis.yml
+
+lib/*.test.js
+lib/*.test.jsx
+lib/*.spec.js
+lib/*.spec.jsx

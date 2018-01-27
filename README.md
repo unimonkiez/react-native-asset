@@ -33,6 +33,6 @@ Instead this library writes `link-assets-manifest.json` to the root of `android`
 ## Parameters
 * `-p, --path` - path to project, defaults to cwd.
 * `-a, --assets` - assets paths, for example `react-native-asset -a ./src/font ./src/mp3`.
-* `-ios-a, --iosassets` - ios assets paths, will disable android linking
-* `-android-a, --androidassets` - android assets paths, will disable ios linking.
+* `-ios-a, --ios-assets` - ios assets paths, will disable android linking
+* `-android-a, --android-assets` - android assets paths, will disable ios linking.
 * `-n-u, --no-unlink` - Not to unlink assets which not longer exists, not recommanded.

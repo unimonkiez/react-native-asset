@@ -3,6 +3,10 @@
 
 ## Link and unlink assets to your react-native project with ease!
 
+## Advantages
+* `react-native link` only supports font files, this tool supports all assets.
+* Unlinking is automatic, with `react-native link`, you need to unlink the files manually.
+
 ### [Check out this starter-kit to use your assets with even more simplicity.](https://github.com/unimonkiez/react-platformula-boilerplate)
 
 ## Usage

@@ -34,10 +34,8 @@
   "dependencies": {
     "fs-extra": "^5.0.0",
     "npmlog": "^4.1.2",
+    "react-native": "^0.52.1",
     "xcode": "^1.0.0"
-  },
-  "peerDependencies": {
-    "react-native": "^0.52.1"
   },
   "devDependencies": {
     "eslint": "^4.16.0",

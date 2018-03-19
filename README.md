@@ -5,7 +5,8 @@
 
 ## Advantages
 * `react-native link` only supports font files, this tool supports all assets.
-* Unlinking is automatic, with `react-native link`, you need to unlink the files manually.
+* Unlinking is automatic when you delete an asset, with `react-native link`, you need to unlink the files manually.
+* Proper link (and unlink) for `mp3` (to use with [`react-native-sound`](https://github.com/zmxv/react-native-sound#basic-usage)) and `ttf` files.
 
 ### [Check out this starter-kit to use your assets with even more simplicity.](https://github.com/unimonkiez/react-platformula-boilerplate)
 

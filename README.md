@@ -41,3 +41,4 @@ Instead this library writes `link-assets-manifest.json` to the root of `android`
 * `-ios-a, --ios-assets` - ios assets paths, will disable android linking
 * `-android-a, --android-assets` - android assets paths, will disable ios linking.
 * `-n-u, --no-unlink` - Not to unlink assets which not longer exists, not recommanded.
+* `-k, --key` - key for assets marking, when this key is specified, it will relink only assets that were previously marked with the same key and left everything else untouched.

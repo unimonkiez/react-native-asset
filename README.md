@@ -31,7 +31,7 @@
   ```bash
   react-native-asset
   ```
-## Exaplain
+## Explanation
 With `react-native link` you have to unlink the files manually, which is hard work.  
 Instead this library writes `link-assets-manifest.json` to the root of `android` and `ios` folders to keep track of the files which it added, for later removing it for you if missing from your `assets`!
 

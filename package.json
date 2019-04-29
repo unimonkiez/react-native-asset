@@ -32,11 +32,11 @@
   },
   "homepage": "https://github.com/unimonkiez/react-native-asset#readme",
   "dependencies": {
-    "fs-extra": "^5.0.0",
+    "fs-extra": "^7.0.1",
     "npmlog": "^4.1.2",
-    "plist": "^2.1.0",
-    "sha1-file": "^1.0.0",
-    "xcode": "^1.0.0"
+    "plist": "^3.0.1",
+    "sha1-file": "^1.0.4",
+    "xcode": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^4.16.0",

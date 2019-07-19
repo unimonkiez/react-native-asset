@@ -17,15 +17,13 @@
   # or yarn
   yarn global add react-native-asset
   ```
-* Add assets to you package json as you would with `react-native link`
+* Add assets to your `react-native.config.js` as you would with `react-native link`
   ```json
   ...
-   "rnpm": {
-      "assets": [
-        "./src/font",
-        "./src/mp3"
-      ]
-   }
+   "assets": [
+      "./src/font",
+      "./src/mp3"
+    ]
   ```
 * Run the command and linking + unlinking is automatic!
   ```bash
@@ -41,3 +39,6 @@ Instead this library writes `link-assets-manifest.json` to the root of `android`
 * `-ios-a, --ios-assets` - ios assets paths, will disable android linking
 * `-android-a, --android-assets` - android assets paths, will disable ios linking.
 * `-n-u, --no-unlink` - Not to unlink assets which not longer exists, not recommanded.
+
+## Backward compatability
+* to use react-native 0.59 and below, use version 1.14.0

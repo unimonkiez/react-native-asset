@@ -41,4 +41,4 @@ Instead this library writes `link-assets-manifest.json` to the root of `android`
 * `-n-u, --no-unlink` - Not to unlink assets which not longer exists, not recommanded.
 
 ## Backward compatability
-* to use react-native 0.59 and below, use version 1.14.0
+* to use react-native 0.59 and below, use version 1.1.4

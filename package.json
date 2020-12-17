@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/unimonkiez/react-native-asset#readme",
   "peerDependencies": {
-    "react-native": "^0.60.0"
+    "react-native": ">=0.60.0"
   },
   "dependencies": {
     "fs-extra": "^7.0.1",

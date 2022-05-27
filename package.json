@@ -35,7 +35,7 @@
     "react-native": "^0.60.0"
   },
   "dependencies": {
-    "fs-extra": "^7.0.1",
+    "fs-extra": "^8.0.0",
     "npmlog": "^4.1.2",
     "plist": "^3.0.1",
     "sha1-file": "^1.0.4",

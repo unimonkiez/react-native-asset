@@ -52,6 +52,8 @@ Instead this library writes `link-assets-manifest.json` to the root of `android`
 * `-a, --assets` - assets paths, for example `react-native-asset -a ./src/font ./src/mp3`.
 * `-ios-a, --ios-assets` - ios assets paths, will disable android linking
 * `-android-a, --android-assets` - android assets paths, will disable ios linking.
+* `-ios-p, --ios-project-path` - ios project path, if not in `$projectRoot/ios`
+* `-android-p, --android-project-path` - android project path, if not in `$projectRoot/android`
 * `-n-u, --no-unlink` - Not to unlink assets which not longer exists, not recommanded.
 
 ## Backward compatability

@@ -18,13 +18,27 @@
   yarn global add react-native-asset
   ```
 * Add assets to your `react-native.config.js` as you would with `react-native link`
-  ```json
+  ```js
   ...
-   "assets": [
+   assets: [
       "./src/font",
-      "./src/mp3"
-    ]
+      "./src/mp3",
+    ];
   ```
+* Add platform-specific assets to your `react-native.config.js` like so:
+  ```js
+  ...
+  assets: [
+    "./src/mp3",
+  ],
+  iosAssets: [
+    "./src/font/ios",
+  ],
+  androidAssets: [
+    "./src/font/android",
+  ],
+  ```
+
 * Run the command and linking + unlinking is automatic!
   ```bash
   react-native-asset

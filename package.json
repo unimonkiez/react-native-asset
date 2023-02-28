@@ -1,6 +1,6 @@
 {
   "name": "react-native-asset",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Linking and unlinking of assets in your react-native app, works for fonts and sounds",
   "main": "lib/index.js",
   "bin": "lib/cli.js",

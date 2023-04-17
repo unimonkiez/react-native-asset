@@ -41,6 +41,7 @@
     "opentype.js": "^1.3.4",
     "plist": "^3.0.1",
     "sha1-file": "^1.0.4",
+    "slugify": "^1.6.6",
     "xcode": "^2.0.0"
   },
   "devDependencies": {

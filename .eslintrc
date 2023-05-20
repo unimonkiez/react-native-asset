@@ -11,16 +11,12 @@
         "devDependencies": true,
         "optionalDependencies": true
       }
-    ]
+    ],
+    "no-bitwise": "off"
   },
   "overrides": [
     {
-      "files": [
-        "*.test.js",
-        "*.spec.js",
-        "*.test.jsx",
-        "*.spec.jsx"
-      ],
+      "files": ["*.test.js", "*.spec.js", "*.test.jsx", "*.spec.jsx"],
       "env": {
         "jest": true
       }

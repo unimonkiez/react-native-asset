@@ -56,3 +56,13 @@ Instead this library writes `link-assets-manifest.json` to the root of `android`
 
 ## Backward compatability
 * to use react-native 0.59 and below, use version 1.1.4
+
+## Troubleshooting
+
+### iOS
+
+#### No such file or directory
+
+The asset paths in the Xcode project are not correct. Open the project in Xcode, find the offending resource files in the Project Navigator (they will be red), and manually fix the file locations in the *Identify and Type* panel.
+
+During the asset linking stage on iOS, assets are added to the Xcode project as Resource files who's paths are resolved *Relative to Group* by Xcode. The linker uses the default `Resources` group path when generating the paths for the files relative to the Xcode project. While this works for most standard React Native boilerplate, many projects customize the layout of the groups within their project.

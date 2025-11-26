@@ -39,7 +39,7 @@
     "npmlog": "^4.1.2",
     "lodash": "4.17.21",
     "plist": "^3.0.1",
-    "sha1-file": "^1.0.4",
+    "sha1-file": "^3.0.0",
     "xcode": "^2.0.0"
   },
   "devDependencies": {

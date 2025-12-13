@@ -14,7 +14,7 @@ await build({
     deno: true,
   },
   package: {
-    name: config.name,
+    name: config.name.substring(config.name.lastIndexOf("/") + 1),
     version: config.version,
     description: config.description,
     license: config.license,

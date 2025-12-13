@@ -1,0 +1,30 @@
+{
+  "name": "react-native-asset",
+  "version": "2.1.1",
+  "description": "Linking and unlinking of assets in your react-native app, works for fonts and sounds",
+  "author": "Yuval Saraf",
+  "license": "MIT",
+  "homepage": "https://github.com/unimonkiez/react-native-asset#readme",
+  "bugs": {
+    "url": "https://github.com/unimonkiez/react-native-asset/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unimonkiez/react-native-asset.git"
+  },
+  "keywords": [
+    "react-native",
+    "react",
+    "native",
+    "js",
+    "asset",
+    "assets",
+    "link"
+  ],
+  "exports": "./src/mod.ts",
+  "imports": {
+    "@deno/dnt": "jsr:@deno/dnt@^0.42.3",
+    "@std/assert": "jsr:@std/assert@1",
+    "xcode": "npm:xcode@^3.0.1"
+  }
+}

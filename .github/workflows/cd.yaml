@@ -1,0 +1,120 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - master
+      - next
+
+jobs:
+  version-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    outputs:
+      new_version: ${{ steps.version.outputs.new_version }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          latest_tag=$(git tag -l | grep -E "^v[0-9]+\.[0-9]+\.[0-9]+$" | sort -V | tail -n 1 || echo "v0.0.0")
+          echo "latest_tag=${latest_tag}" >> $GITHUB_OUTPUT
+          echo "Latest non rc tag is: ${latest_tag}"
+
+      - name: Determine version bump type
+        id: bump_type
+        run: |
+          messages=$(git log ${{ steps.get_tag.outputs.latest_tag }}..HEAD --pretty=format:"%s")
+
+          bump_type="patch"
+          while read -r line; do
+            if [[ "$line" =~ ^major: ]]; then
+              bump_type="major"
+              break
+            elif [[ "$line" =~ ^minor: ]]; then
+              bump_type="minor"
+              break
+            fi
+          done <<< "$messages"
+          echo "type=$bump_type" >> $GITHUB_OUTPUT
+          echo "Bump type is: ${bump_type}"
+
+      - name: Calculate new version
+        id: version
+        run: |
+          latest_tag="${{ steps.get_tag.outputs.latest_tag }}"
+          current_version=${latest_tag#v}
+
+          major=$(echo $current_version | cut -d. -f1)
+          minor=$(echo $current_version | cut -d. -f2)
+          patch=$(echo $current_version | cut -d. -f3 | cut -d- -f1)
+
+          case "${{ steps.bump_type.outputs.type }}" in
+            major)
+              new_version="$((major + 1)).0.0"
+              ;;
+            minor)
+              new_version="${major}.$((minor + 1)).0"
+              ;;
+            patch)
+              new_version="${major}.${minor}.$((patch + 1))"
+              ;;
+          esac
+
+          if [[ "${{ github.ref }}" == "refs/heads/next" ]]; then
+            rc_num=1
+            highest_rc=$(git tag -l "v${new_version}-rc*" | grep -E "^v${new_version}-rc[0-9]+$" | sort -V | tail -n 1 || echo "")
+            if [[ ! -z "$highest_rc" ]]; then
+              old_rc=$(echo $highest_rc | grep -o 'rc[0-9]*' | grep -o '[0-9]*')
+              rc_num=$((old_rc + 1))
+            fi
+            new_version="${new_version}-rc${rc_num}"
+          fi
+
+          echo "new_version=${new_version}" >> $GITHUB_OUTPUT
+          echo "New version will be: ${new_version}"
+
+      - name: Create tag
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "v${{ steps.version.outputs.new_version }}" -m "Release v${{ steps.version.outputs.new_version }}"
+          git push --tags
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ steps.version.outputs.new_version }}"
+          name: "Release v${{ steps.version.outputs.new_version }}"
+          draft: false
+          prerelease: ${{ github.ref == 'refs/heads/next' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    needs: [version-and-release]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: "v${{ needs.version-and-release.outputs.new_version }}"
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.6.0"
+
+      - name: publish
+        run: |
+          sed -i "0,/\"version\": \".*\"/s/\"version\": \".*\"/\"version\": \"${{ needs.version-and-release.outputs.new_version }}\"/" deno.json
+          deno publish --allow-dirty
+          deno run --allow-read --allow-write --allow-run --allow-env bin/build-for-npm.ts
+          (cd npm && npm publish)

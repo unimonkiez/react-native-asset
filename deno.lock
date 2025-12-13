@@ -4,6 +4,7 @@
     "jsr:@david/code-block-writer@^13.0.3": "13.0.3",
     "jsr:@deno/dnt@~0.42.3": "0.42.3",
     "jsr:@std/assert@1": "1.0.16",
+    "jsr:@std/cli@^1.0.24": "1.0.24",
     "jsr:@std/fmt@1": "1.0.8",
     "jsr:@std/fs@1": "1.0.20",
     "jsr:@std/internal@^1.0.12": "1.0.12",
@@ -29,6 +30,12 @@
     },
     "@std/assert@1.0.16": {
       "integrity": "6a7272ed1eaa77defe76e5ff63ca705d9c495077e2d5fd0126d2b53fc5bd6532",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/cli@1.0.24": {
+      "integrity": "b655a5beb26aa94f98add6bc8889f5fb9bc3ee2cc3fc954e151201f4c4200a5e",
       "dependencies": [
         "jsr:@std/internal"
       ]
@@ -126,6 +133,8 @@
     "dependencies": [
       "jsr:@deno/dnt@~0.42.3",
       "jsr:@std/assert@1",
+      "jsr:@std/cli@^1.0.24",
+      "jsr:@std/path@^1.1.3",
       "npm:xcode@^3.0.1"
     ]
   }

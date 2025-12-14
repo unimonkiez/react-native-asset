@@ -1,6 +1,6 @@
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import getConfig from "./get-config.ts";
+import { getConfig } from "./get-config.ts";
 import copyAssetsIos from "./copy-assets/ios.ts";
 import cleanAssetsIos from "./clean-assets/ios.ts";
 import copyAssetsAndroid from "./copy-assets/android.ts";
@@ -156,7 +156,7 @@ export const linkAssets = async (
 
   // helper modules are statically imported at the top of this file
 
-  const config = getConfig({ rootPath: finalRootPath });
+  const config = await getConfig({ rootPath: finalRootPath });
   const {
     android: { path: androidPath },
     ios: { path: iosPath },

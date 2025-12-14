@@ -18,7 +18,7 @@ export default async function copyAssetsAndroid(
 
   try {
     try {
-      Deno.lstatSync(destBase);
+      await Deno.lstat(destBase);
     } catch (_e) {
       await Deno.mkdir(destBase, { recursive: true });
     }

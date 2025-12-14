@@ -20,12 +20,12 @@ const setupLinkAssetsMocks = (
   mockFileSystem: MockFileContentMap,
 ) => {
   const cwdStub = stub(Deno, "cwd", () => path.SEPARATOR);
+  const mkdirStub = stub(Deno, "mkdir", () => Promise.resolve());
+  const copyFileStub = stub(Deno, "copyFile", () => Promise.resolve());
 
   const lstatStub = stub(Deno, "lstat", (p) => {
-    const isFile = p.toString().indexOf(".") !== -1;
-    return Promise.resolve({
-      isFile,
-      isDirectory: !isFile,
+    const f = p.toString();
+    const defaultFile = {
       isSymlink: false,
       size: 0,
       mtime: null,
@@ -45,6 +45,19 @@ const setupLinkAssetsMocks = (
       isCharDevice: null,
       isFifo: null,
       isSocket: null,
+    };
+    if (f === "/ios" || f === "/android") {
+      return Promise.resolve({
+        ...defaultFile,
+        isFile: false,
+        isDirectory: true,
+      });
+    }
+    const isFile = f.indexOf(".") !== -1;
+    return Promise.resolve({
+      ...defaultFile,
+      isFile,
+      isDirectory: !isFile,
     });
   });
 
@@ -144,7 +157,15 @@ const setupLinkAssetsMocks = (
     (..._args: unknown[]) => Promise.resolve(),
   );
 
-  return { readDirStub, readFileStub, writeTextFileStub, cwdStub, lstatStub };
+  return {
+    readDirStub,
+    readFileStub,
+    writeTextFileStub,
+    cwdStub,
+    lstatStub,
+    mkdirStub,
+    copyFileStub,
+  };
 };
 
 /**
@@ -156,21 +177,22 @@ const restoreMocks = (stubs: ReturnType<typeof setupLinkAssetsMocks>): void => {
   stubs.writeTextFileStub.restore();
   stubs.cwdStub.restore();
   stubs.lstatStub.restore();
+  stubs.mkdirStub.restore();
+  stubs.copyFileStub.restore();
 };
 
 /**
  * Helper function to extract and parse the manifest content from the write stub.
  */
 const getFile = (
-  writeTextFileStub: ReturnType<
+  stubs: ReturnType<
     typeof setupLinkAssetsMocks
-  >["writeTextFileStub"],
+  >,
   p: string,
 ): string => {
-  const theCall = writeTextFileStub.calls.find((call) =>
+  const theCall = stubs.writeTextFileStub.calls.find((call) =>
     call.args[0].toString().includes(p)
   );
-
   if (!theCall) {
     throw new Error(
       `File not found: ${p}`,
@@ -181,12 +203,31 @@ const getFile = (
   return content;
 };
 
+const assertFileCopied = (
+  stubs: ReturnType<
+    typeof setupLinkAssetsMocks
+  >,
+  from: string,
+  to: string,
+) => {
+  const theCall = stubs.copyFileStub.calls.find((call) =>
+    call.args[0].toString().includes(from)
+  );
+  if (!theCall) {
+    throw new Error(
+      `File not found: ${from}`,
+    );
+  }
+  assertEquals(to, theCall.args[1]);
+};
+
 // --- TEST CASES ---
 
-Deno.test("linkAssets test manifest creation with sound.mp3 and image.png", async () => {
+Deno.test("linkAssets test manifest creation and files handling for Android", async () => {
   const stubs = setupLinkAssetsMocks({
     "/assets/sound.mp3": "a",
     "/assets/image.png": "b",
+    "/assets/font.ttf": "c",
   });
 
   try {
@@ -205,14 +246,41 @@ Deno.test("linkAssets test manifest creation with sound.mp3 and image.png", asyn
     });
 
     const iosManifest = JSON.parse(getFile(
-      stubs.writeTextFileStub,
-      "/ios/manifest.json",
+      stubs,
+      "/android/react-native-assets-manifest.json",
     ));
 
     assertEquals(
-      iosManifest.count,
-      2,
-      "iOS manifest should have 'count' property equal to 2.",
+      iosManifest,
+      [
+        {
+          path: "assets/sound.mp3",
+          sha1: "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8",
+        },
+        {
+          path: "assets/image.png",
+          sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
+        },
+        {
+          path: "assets/font.ttf",
+          sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
+        },
+      ],
+    );
+    assertFileCopied(
+      stubs,
+      "/assets/sound.mp3",
+      "/android/app/src/main/res/raw/sound.mp3",
+    );
+    assertFileCopied(
+      stubs,
+      "/assets/image.png",
+      "/android/app/src/main/res/drawable/image.png",
+    );
+    assertFileCopied(
+      stubs,
+      "/assets/font.ttf",
+      "/android/app/src/main/assets/fonts/font.ttf",
     );
   } finally {
     restoreMocks(stubs);

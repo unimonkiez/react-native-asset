@@ -14,9 +14,17 @@ export const getConfig = async ({ rootPath }: { rootPath: string }) => {
     // Ok
   }
 
+  let pbxprojPath = undefined as string | undefined;
   try {
     const st = await Deno.lstat(iosPath);
     iosExists = st.isDirectory;
+    for await (const dir of Deno.readDir(iosPath)) {
+      if (dir.isDirectory && dir.name.endsWith(".xcodeproj")) {
+        const pbxproj = path.resolve(iosPath, dir.name, "project.pbxproj");
+        pbxprojPath = pbxproj;
+        break;
+      }
+    }
   } catch (_e) {
     // Ok
   }
@@ -29,6 +37,7 @@ export const getConfig = async ({ rootPath }: { rootPath: string }) => {
     ios: {
       path: iosPath,
       exists: iosExists,
+      pbxprojPath,
     },
   };
 };

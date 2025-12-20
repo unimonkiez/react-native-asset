@@ -7,4 +7,4 @@ lint:
 typecheck:
 	deno check src/**/*
 test:
-	deno test
+	deno test --unstable-raw-imports

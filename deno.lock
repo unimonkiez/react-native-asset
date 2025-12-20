@@ -17,6 +17,7 @@
     "jsr:@std/testing@^1.0.16": "1.0.16",
     "jsr:@ts-morph/bootstrap@0.27": "0.27.0",
     "jsr:@ts-morph/common@0.27": "0.27.0",
+    "npm:plist@^3.1.0": "3.1.0",
     "npm:xcode@^3.0.1": "3.0.1"
   },
   "jsr": {
@@ -154,6 +155,7 @@
       "jsr:@std/cli@^1.0.24",
       "jsr:@std/path@^1.1.3",
       "jsr:@std/testing@^1.0.16",
+      "npm:plist@^3.1.0",
       "npm:xcode@^3.0.1"
     ]
   }

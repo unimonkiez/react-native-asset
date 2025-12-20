@@ -247,7 +247,10 @@ export const linkAssets = async (
   }: {
     name: string;
     manifest: ReturnType<typeof getManifest>;
-    config: { path: string; exists: boolean };
+    config: { path: string } | {
+      path: string;
+      pbxprojPath: string;
+    };
     linkOptionsPerExt: {
       [k: string]: { path: string } | { addFont: boolean };
     };
@@ -346,7 +349,7 @@ export const linkAssets = async (
           prevRelativeAssetsWithExt.map(({ path: filePath }) =>
             getAbsolute({ filePath, dirPath: rp })
           ),
-          platformConfig,
+          platformConfig as { path: string; pbxprojPath: string },
           options as { path: string } & { addFont: boolean },
         );
       }
@@ -355,7 +358,7 @@ export const linkAssets = async (
         console.info(`Linking ${fileConfigName} assets to ${name} project`);
         await copyAssets(
           assetsWithExt.map(({ path: assetPath }) => assetPath),
-          platformConfig,
+          platformConfig as { path: string; pbxprojPath: string },
           options as { path: string } & { addFont: boolean },
         );
       }

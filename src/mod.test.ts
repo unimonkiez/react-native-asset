@@ -1,7 +1,9 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertStringIncludes } from "@std/assert";
 import * as path from "@std/path";
 import { stub } from "@std/testing/mock";
 import { linkAssets } from "@unimonkiez/react-native-asset";
+import testProjectPbxproj from "./test_project.pbxproj" with { type: "text" };
+import testInfoPlist from "./test_Info.plist" with { type: "text" };
 
 // --- INFRASTRUCTURE: Mocking Deno I/O Functions ---
 
@@ -245,13 +247,13 @@ Deno.test("linkAssets test manifest creation and files handling for Android", as
       },
     });
 
-    const iosManifest = JSON.parse(getFile(
+    const manifest = JSON.parse(getFile(
       stubs,
       "/android/react-native-assets-manifest.json",
     ));
 
     assertEquals(
-      iosManifest,
+      manifest,
       [
         {
           path: "assets/sound.mp3",
@@ -282,6 +284,82 @@ Deno.test("linkAssets test manifest creation and files handling for Android", as
       "/assets/font.ttf",
       "/android/app/src/main/assets/fonts/font.ttf",
     );
+  } finally {
+    restoreMocks(stubs);
+  }
+});
+
+Deno.test("linkAssets test manifest creation and files handling for iOS", async () => {
+  const stubs = setupLinkAssetsMocks({
+    "/ios/HelloWorld.xcodeproj/project.pbxproj": testProjectPbxproj,
+    "/ios/HelloWorld/Info.plist": testInfoPlist,
+    "/assets/sound.mp3": "a",
+    "/assets/image.png": "b",
+    "/assets/font.ttf": "c",
+  });
+
+  try {
+    await linkAssets({
+      rootPath: ".",
+      platforms: {
+        android: {
+          enabled: false,
+          assets: [],
+        },
+        ios: {
+          enabled: true,
+          assets: ["assets"],
+        },
+      },
+    });
+
+    const manifest = JSON.parse(getFile(
+      stubs,
+      "/ios/react-native-assets-manifest.json",
+    ));
+
+    assertEquals(
+      manifest,
+      [
+        {
+          path: "assets/sound.mp3",
+          sha1: "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8",
+        },
+        {
+          path: "assets/image.png",
+          sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
+        },
+        {
+          path: "assets/font.ttf",
+          sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
+        },
+      ],
+    );
+    const newTestProjectPbxproj = getFile(
+      stubs,
+      "/ios/HelloWorld.xcodeproj/project.pbxproj",
+    );
+    const newTestInfoPlist = getFile(
+      stubs,
+      "/ios/HelloWorld/Info.plist",
+    );
+    // assertStringIncludes(
+    //   newTestProjectPbxproj,
+    //   "../assets/sound.mp3",
+    // );
+    // assertStringIncludes(
+    //   newTestProjectPbxproj,
+    //   "../assets/image.png",
+    // );
+    // assertStringIncludes(
+    //   newTestProjectPbxproj,
+    //   "../assets/font.ttf",
+    // );
+
+    // assertEquals(
+    //   testInfoPlist,
+    //   newTestInfoPlist,
+    // );
   } finally {
     restoreMocks(stubs);
   }

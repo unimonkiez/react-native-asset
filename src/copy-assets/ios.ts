@@ -1,5 +1,7 @@
 import * as path from "@std/path";
+/// <reference types="../xcode.d.ts" />
 import * as xcode from "xcode";
+/// <reference types="../xcode.d.ts" />
 import * as xcodeParser from "xcode/lib/parser/pbxproj.js";
 import createGroupWithMessage from "../react-native-lib/ios/createGroupWithMessage.js";
 import getPlist from "../react-native-lib/ios/getPlist.js";

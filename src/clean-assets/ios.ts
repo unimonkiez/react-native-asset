@@ -1,4 +1,5 @@
 import * as path from "@std/path";
+/// <reference types="../xcode.d.ts" />
 import * as xcode from "xcode";
 import createGroupWithMessage from "../react-native-lib/ios/createGroupWithMessage.js";
 import getPlist from "../react-native-lib/ios/getPlist.js";

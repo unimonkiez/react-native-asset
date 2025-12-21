@@ -97,7 +97,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  publish:
+  publish-jsr:
     needs: [version-and-release]
     runs-on: ubuntu-latest
     permissions:
@@ -116,5 +116,26 @@ jobs:
         run: |
           sed -i "0,/\"version\": \".*\"/s/\"version\": \".*\"/\"version\": \"${{ needs.version-and-release.outputs.new_version }}\"/" deno.json
           deno publish --allow-dirty
+
+  publish-npm:
+    needs: [version-and-release]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: "v${{ needs.version-and-release.outputs.new_version }}"
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.6.3"
+
+      - name: publish
+        run: |
+          sed -i "0,/\"version\": \".*\"/s/\"version\": \".*\"/\"version\": \"${{ needs.version-and-release.outputs.new_version }}\"/" deno.json
           deno run --allow-read --allow-write --allow-run --allow-env bin/build-for-npm.ts
           (cd npm && npm publish --tag $([[ "${{ github.ref }}" == "refs/heads/next" ]] && echo "next" || echo "latest"))
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

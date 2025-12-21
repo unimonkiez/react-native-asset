@@ -8,9 +8,17 @@ await emptyDir("./npm");
 await emptyDir("./test");
 
 await build({
-  entryPoints: ["./src/mod.ts"],
+  entryPoints: [{
+    kind: "bin",
+    name: "react-native-asset",
+    path: "./src/mod.ts",
+  }, {
+    kind: "export",
+    name: "react-native-asset",
+    path: "./src/mod.ts",
+  }],
   outDir: "./npm",
-  typeCheck: "both",
+  typeCheck: false, // Couldn't because of xcode.d.ts "both",
   shims: {
     deno: true,
   },

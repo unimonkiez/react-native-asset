@@ -1,7 +1,7 @@
 # react-native-asset
 
+[![jsr version](https://jsr.io/badges/@unimonkiez/react-native-asset)](https://jsr.io/@unimonkiez/react-native-asset)
 [![npm version](https://badge.fury.io/js/react-native-asset.svg)](https://badge.fury.io/js/react-native-asset)
-[![Build Status](https://travis-ci.org/unimonkiez/react-native-asset.svg?branch=master)](https://travis-ci.org/unimonkiez/react-native-asset)
 
 ## Link and unlink assets to your react-native project with ease!
 
@@ -18,11 +18,9 @@
 
 ## Usage
 
-- Install
+- Install (globally or locally and later run with `npx`)
   ```bash
   npm install -g react-native-asset
-  # or yarn
-  yarn global add react-native-asset
   ```
 - Add assets to your `react-native.config.js` as you would with
   `react-native link`
@@ -34,6 +32,7 @@
     ];
   ```
 - Add platform-specific assets to your `react-native.config.js` like so:
+
   ```js
   ...
   assets: [
@@ -50,6 +49,10 @@
 - Run the command and linking + unlinking is automatic!
   ```bash
   react-native-asset
+  ```
+  Can also run with Deno without installing
+  ```
+  deno run @unimonkiez/react-native-asset
   ```
 
 ## Explanation

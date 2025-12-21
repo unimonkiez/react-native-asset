@@ -1,6 +1,6 @@
 export { linkAssets } from "./main.ts";
 import { runCli } from "./cli.ts";
-import "./xcode.d.ts";
+import type {} from "./xcode.d.ts";
 
 if (import.meta.main) {
   runCli().catch((e) => {

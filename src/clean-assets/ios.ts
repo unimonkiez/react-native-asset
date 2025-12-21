@@ -27,13 +27,13 @@ export default async function cleanAssetsIos(
 
   if (options.addFont) {
     const existingFonts = plist.UIAppFonts || [];
-    const allFonts = existingFonts.filter((file: unknown) =>
+    const allFonts = existingFonts.filter((file: string) =>
       removedFiles.indexOf(file) === -1
     );
     plist.UIAppFonts = Array.from(new Set(allFonts)); // use Set to dedupe w/existing
   }
 
-  await Deno.writeFile(
+  await Deno.writeTextFile(
     platformConfig.pbxprojPath,
     project.writeSync(),
   );

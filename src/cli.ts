@@ -33,8 +33,12 @@ export const runCli = async () => {
 
   const reactNativeConfig = reactNativeConfigExists
     ? (await import(
-      path.join(args.path, `react-native-config.js`)
-    )) as { assets?: string[]; iosAssets?: string[]; androidAssets?: string[] }
+      path.join(args.path, `react-native.config.js`)
+    )) as {
+      assets?: string[];
+      iosAssets?: string[];
+      androidAssets?: string[];
+    }
     : {};
 
   const merged = {

@@ -25,6 +25,6 @@ export default async function writePlist(project, sourceDir, plist) {
   // Ref: https://github.com/facebook/react-native/issues/11668
   return await Deno.writeTextFile(
     plistPath,
-    `${plistParser.build(plist, { indent: "\t", offset: -1 })}\n`
+    `${plistParser.build(plist, { indent: "\t", offset: -1 })}\n`,
   );
 }

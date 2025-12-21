@@ -16,7 +16,7 @@ export default async function cleanAssetsAndroid(
         if (st.isFile) {
           await Deno.remove(target);
         }
-      } catch (e) {
+      } catch (_e) {
         // ignore missing files
       }
     } catch (e) {

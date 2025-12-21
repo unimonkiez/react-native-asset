@@ -38,7 +38,7 @@ export const linkAssets = async (
       };
     };
   },
-) => {
+): Promise<void> => {
   const cwd = Deno.cwd();
 
   const clearDuplicated = (files: Array<{ path: string; sha1: string }>) =>

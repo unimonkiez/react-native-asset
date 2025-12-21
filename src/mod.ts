@@ -103,25 +103,15 @@ export const linkAssets = async (
   console.log(`Linking assets in ${absoluteRootPath}`);
 
   // basic validation
-  try {
-    const st = await Deno.lstat(rootPath);
-    if (!st.isDirectory) {
-      throw new Error(`'rootPath' must be a valid path, got ${rootPath}`);
-    }
-  } catch (_e) {
-    // If lstat on the given rootPath failed try resolving relative to cwd
-    try {
-      const st2 = await Deno.lstat(absoluteRootPath);
-      if (!st2.isDirectory) {
-        throw new Error(
-          `'rootPath' must be a valid path, got ${absoluteRootPath}`,
-        );
-      }
-    } catch (_err) {
-      throw new Error(
-        `'rootPath' must be a valid path, got ${absoluteRootPath}`,
-      );
-    }
+  const st = await Deno.lstat(rootPath);
+  if (!st.isDirectory) {
+    throw new Error(`'rootPath' must be a valid path, got ${rootPath}`);
+  }
+  const st2 = await Deno.lstat(absoluteRootPath);
+  if (!st2.isDirectory) {
+    throw new Error(
+      `'rootPath' must be a valid path, got ${absoluteRootPath}`,
+    );
   }
 
   if (typeof shouldUnlink !== "boolean") {

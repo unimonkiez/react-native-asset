@@ -23,11 +23,13 @@ export default async function copyAssetsAndroid(
       await Deno.mkdir(destBase, { recursive: true });
     }
 
-    for (const asset of assetPaths) {
+    Promise.all(assetPaths.map(async (asset) => {
+      const dir = path.dirname(asset);
+      await Deno.mkdir(dir, { recursive: true });
       const base = path.basename(asset);
       const dest = path.resolve(destBase, base);
       await Deno.copyFile(asset, dest);
-    }
+    }));
   } catch (e) {
     console.error("Failed copying android assets:", e);
     throw e;

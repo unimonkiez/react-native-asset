@@ -32,9 +32,7 @@ export const runCli = async () => {
   }
 
   const reactNativeConfig = reactNativeConfigExists
-    ? (await import(
-      path.join(args.path, `react-native.config.js`)
-    )).default as {
+    ? (await import(reactNativeConfigPath)).default as {
       assets?: string[];
       iosAssets?: string[];
       androidAssets?: string[];

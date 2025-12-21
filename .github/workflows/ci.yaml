@@ -11,7 +11,7 @@ jobs:
           persist-credentials: false
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.6.0"
+          deno-version: "2.6.3"
       - name: Format
         run: make format-check
       - name: Lint

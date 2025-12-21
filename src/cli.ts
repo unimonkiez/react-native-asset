@@ -20,7 +20,7 @@ export const runCli = async () => {
     },
   });
 
-  const reactNativeConfigPath = path.join(args.path, `react-native-config.js`);
+  const reactNativeConfigPath = path.join(args.path, `react-native.config.js`);
   let reactNativeConfigExists = false;
   try {
     const _ = await Deno.lstat(reactNativeConfigPath);

@@ -5,6 +5,7 @@ const { default: config } = await import("../deno.json", {
 });
 
 await emptyDir("./npm");
+await emptyDir("./test");
 
 await build({
   entryPoints: ["./src/mod.ts"],

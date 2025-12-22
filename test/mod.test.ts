@@ -30,25 +30,28 @@ Deno.test("linkAssets test manifest creation and files handling for Android", as
     });
 
     const manifest = JSON.parse(stubs.getFile(
-      "/android/react-native-assets-manifest.json",
+      "/android/link-assets-manifest.json",
     ));
 
     assertEquals(
       manifest,
-      [
-        {
-          path: "assets/sound.mp3",
-          sha1: "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8",
-        },
-        {
-          path: "assets/image.png",
-          sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
-        },
-        {
-          path: "assets/font.ttf",
-          sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
-        },
-      ],
+      {
+        migIndex: 1,
+        data: [
+          {
+            path: "assets/sound.mp3",
+            sha1: "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8",
+          },
+          {
+            path: "assets/image.png",
+            sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
+          },
+          {
+            path: "assets/font.ttf",
+            sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
+          },
+        ],
+      },
     );
     stubs.assertFileCopied(
       "/assets/sound.mp3",
@@ -61,6 +64,44 @@ Deno.test("linkAssets test manifest creation and files handling for Android", as
     stubs.assertFileCopied(
       "/assets/font.ttf",
       "/android/app/src/main/assets/fonts/font.ttf",
+    );
+
+    stubs.removeFile("/assets/sound.mp3");
+    await linkAssets({
+      rootPath: ".",
+      platforms: {
+        android: {
+          enabled: true,
+          assets: ["assets"],
+        },
+        ios: {
+          enabled: false,
+          assets: [],
+        },
+      },
+    });
+    const manifestAfterRemove = JSON.parse(stubs.getFile(
+      "/android/link-assets-manifest.json",
+    ));
+
+    assertEquals(
+      manifestAfterRemove,
+      {
+        migIndex: 1,
+        data: [
+          {
+            path: "assets/image.png",
+            sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
+          },
+          {
+            path: "assets/font.ttf",
+            sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
+          },
+        ],
+      },
+    );
+    stubs.assertFileNotExists(
+      "/android/app/src/main/res/raw/sound.mp3",
     );
   } finally {
     stubs.restore();
@@ -100,21 +141,24 @@ Deno.test("linkAssets test manifest creation and files handling for iOS", async 
     });
 
     const manifest = JSON.parse(stubs.getFile(
-      "/ios/react-native-assets-manifest.json",
+      "/ios/link-assets-manifest.json",
     ));
 
     assertEquals(
       manifest,
-      [
-        {
-          path: "assets/sound.mp3",
-          sha1: "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8",
-        },
-        {
-          path: "assets/image.png",
-          sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
-        },
-      ],
+      {
+        migIndex: 1,
+        data: [
+          {
+            path: "assets/sound.mp3",
+            sha1: "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8",
+          },
+          {
+            path: "assets/image.png",
+            sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
+          },
+        ],
+      },
     );
     const newTestProjectPbxproj = stubs.getFile(
       "/ios/HelloWorld.xcodeproj/project.pbxproj",
@@ -171,17 +215,20 @@ Deno.test("linkAssets test manifest creation and files handling for iOS with a f
     });
 
     const manifest = JSON.parse(stubs.getFile(
-      "/ios/react-native-assets-manifest.json",
+      "/ios/link-assets-manifest.json",
     ));
 
     assertEquals(
       manifest,
-      [
-        {
-          path: "assets/font.ttf",
-          sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
-        },
-      ],
+      {
+        migIndex: 1,
+        data: [
+          {
+            path: "assets/font.ttf",
+            sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
+          },
+        ],
+      },
     );
     const newTestProjectPbxproj = stubs.getFile(
       "/ios/HelloWorld.xcodeproj/project.pbxproj",

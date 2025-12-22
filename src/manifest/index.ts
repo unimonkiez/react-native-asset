@@ -1,6 +1,11 @@
 import * as path from "@std/path";
 
-const manifestFileName = "react-native-assets-manifest.json";
+const manifestFileName = "link-assets-manifest.json";
+
+type Manifest = {
+  migIndex: 1;
+  data: Array<{ path: string; sha1: string }>;
+};
 
 export default function getManifest(projectPath: string) {
   const manifestPath = path.resolve(projectPath, manifestFileName);
@@ -8,13 +13,16 @@ export default function getManifest(projectPath: string) {
   return {
     read: async () => {
       try {
-        const data = await Deno.readTextFile(manifestPath);
-        return JSON.parse(data) as Array<{ path: string; sha1?: string }>;
-      } catch (_) {
+        const data = await Deno.readFile(manifestPath);
+        return (JSON.parse(new TextDecoder().decode(data)) as Manifest).data;
+      } catch (e) {
+        if (!(e instanceof Deno.errors.NotFound)) {
+          throw e;
+        }
         return [];
       }
     },
-    write: async (files: Array<{ path: string; sha1?: string }>) => {
+    write: async (files: Array<{ path: string; sha1: string }>) => {
       try {
         const dir = path.dirname(manifestPath);
         try {
@@ -22,7 +30,10 @@ export default function getManifest(projectPath: string) {
         } catch (_) {
           await Deno.mkdir(dir, { recursive: true });
         }
-        await Deno.writeTextFile(manifestPath, JSON.stringify(files, null, 2));
+        await Deno.writeTextFile(
+          manifestPath,
+          JSON.stringify({ migIndex: 1, data: files } as Manifest, null, 2),
+        );
       } catch (e) {
         throw e;
       }

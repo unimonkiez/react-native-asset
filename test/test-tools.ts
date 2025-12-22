@@ -100,7 +100,26 @@ export const setupLinkAssetsMocks = (
   mockFileSystem: MockFileContentMap,
 ) => {
   const innerMockFileSystem = mockFileSystemToInner(mockFileSystem);
-
+  const removeStub = stub(Deno, "remove", (p: string | URL) => {
+    const filePath = p.toString();
+    const parentPath = path.dirname(filePath);
+    const parent = getMockRecord(innerMockFileSystem, parentPath);
+    if (!parent || parent.type !== InnerMockFileType.Directory) {
+      return Promise.reject(
+        new Deno.errors.NotFound(`Mock: Directory ${parentPath} not found.`),
+      );
+    }
+    const fileIndex = parent.children.findIndex((x) =>
+      x.path === path.basename(filePath)
+    );
+    if (fileIndex === -1) {
+      return Promise.reject(
+        new Deno.errors.NotFound(`Mock: File ${filePath} not found.`),
+      );
+    }
+    parent.children.splice(fileIndex, 1);
+    return Promise.resolve();
+  });
   const cwdStub = stub(Deno, "cwd", () => path.SEPARATOR);
   const mkdirStub = stub(
     Deno,
@@ -377,10 +396,12 @@ export const setupLinkAssetsMocks = (
     lstatStub.restore();
     mkdirStub.restore();
     copyFileStub.restore();
+    removeStub.restore();
   };
 
   return {
     restore,
+    removeFile: (p: string) => Deno.remove(p),
     getFile: (p: string) => {
       const mockRecord = getMockRecord(innerMockFileSystem, p);
       if (
@@ -402,6 +423,14 @@ export const setupLinkAssetsMocks = (
         throw new Error(`File not found: ${to}`);
       }
       assertEquals(from, mockRecord.copiedFrom);
+    },
+    assertFileNotExists: (from: string) => {
+      const mockRecord = getMockRecord(innerMockFileSystem, from);
+      if (
+        mockRecord
+      ) {
+        throw new Error(`File found: ${from}`);
+      }
     },
   };
 };

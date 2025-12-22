@@ -234,16 +234,8 @@ export const linkAssets = async (
     copyAssets: typeof copyAssetsIos | typeof copyAssetsAndroid;
     assets: string[];
   }) => {
-    let prevRelativeAssets: Array<{ path: string; sha1?: string }> = [];
-    try {
-      prevRelativeAssets = (await manifest.read()).map((asset) => ({
-        ...asset,
-        path: asset.path.split("/").join(path.SEPARATOR),
-      }));
-    } catch (_) {
-      // manifest not found -> ok
-    }
-
+    const prevRelativeAssets: Array<{ path: string; sha1?: string }> =
+      await manifest.read();
     let assets: Array<{ path: string; sha1: string }> = [];
 
     const loadAsset = async (assetMightNotAbsolute: string) => {
@@ -318,7 +310,9 @@ export const linkAssets = async (
 
       if (su && prevRelativeAssetsWithExt.length > 0) {
         console.info(
-          `Cleaning previously linked ${fileConfigName} assets from ${name} project`,
+          `Cleaning previously linked ${fileConfigName} assets from ${name} project, prevRelativeAssetsWithExt: ${
+            prevRelativeAssetsWithExt.map((x) => x.path)
+          }`,
         );
         await cleanAssets(
           prevRelativeAssetsWithExt.map(({ path: filePath }) =>

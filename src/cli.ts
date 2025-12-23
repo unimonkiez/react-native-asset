@@ -1,6 +1,7 @@
 import * as path from "@std/path";
 import { parseArgs } from "@std/cli/parse-args";
 import { linkAssets } from "./main.ts";
+import { pathToFileURL } from "node:url";
 
 export const runCli = async () => {
   const args = await parseArgs(Deno.args, {
@@ -32,7 +33,7 @@ export const runCli = async () => {
   }
 
   const reactNativeConfig = reactNativeConfigExists
-    ? (await import(reactNativeConfigPath)).default as {
+    ? (await import(pathToFileURL(reactNativeConfigPath).href)).default as {
       assets?: string[];
       iosAssets?: string[];
       androidAssets?: string[];

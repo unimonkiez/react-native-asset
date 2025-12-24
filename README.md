@@ -72,7 +72,7 @@ it for you if missing from your `assets`!
 - `-android-a, --android-assets` - android assets paths, will disable ios
   linking.
 - `-n-u, --no-unlink` - Not to unlink assets which not longer exists, not
-  recommanded.
+  recommended.
 
 ## Backward compatability
 

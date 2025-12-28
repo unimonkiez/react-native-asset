@@ -52,7 +52,7 @@
   ```
   Can also run with Deno without installing
   ```
-  deno run @unimonkiez/react-native-asset
+  deno run jsr:@unimonkiez/react-native-asset
   ```
 
 ## Explanation

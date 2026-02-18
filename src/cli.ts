@@ -40,15 +40,18 @@ export const runCli = async () => {
     }
     : {};
 
+  const filteredAssets = args.assets.filter(Boolean);
+  const filteredIosAssets = args["ios-assets"].filter(Boolean);
+  const filteredAndroidAssets = args["android-assets"].filter(Boolean);
   const merged = {
-    assets: args.assets.length !== 0
-      ? args.assets
+    assets: filteredAssets.length !== 0
+      ? filteredAssets
       : (reactNativeConfig.assets ?? undefined),
-    iosAssets: args["ios-assets"].length !== 0
-      ? args["ios-assets"]
+    iosAssets: filteredIosAssets.length !== 0
+      ? filteredIosAssets
       : (reactNativeConfig.iosAssets ?? undefined),
-    androidAssets: args["android-assets"].length !== 0
-      ? args["android-assets"]
+    androidAssets: filteredAndroidAssets.length !== 0
+      ? filteredAndroidAssets
       : (reactNativeConfig.androidAssets ?? undefined),
   };
 

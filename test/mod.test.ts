@@ -39,16 +39,16 @@ Deno.test("linkAssets test manifest creation and files handling for Android", as
         migIndex: 1,
         data: [
           {
-            path: "assets/sound.mp3",
-            sha1: "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8",
+            path: "assets/font.ttf",
+            sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
           },
           {
             path: "assets/image.png",
             sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
           },
           {
-            path: "assets/font.ttf",
-            sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
+            path: "assets/sound.mp3",
+            sha1: "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8",
           },
         ],
       },
@@ -90,12 +90,12 @@ Deno.test("linkAssets test manifest creation and files handling for Android", as
         migIndex: 1,
         data: [
           {
-            path: "assets/image.png",
-            sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
-          },
-          {
             path: "assets/font.ttf",
             sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
+          },
+          {
+            path: "assets/image.png",
+            sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
           },
         ],
       },
@@ -150,12 +150,12 @@ Deno.test("linkAssets test manifest creation and files handling for iOS", async 
         migIndex: 1,
         data: [
           {
-            path: "assets/sound.mp3",
-            sha1: "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8",
-          },
-          {
             path: "assets/image.png",
             sha1: "e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98",
+          },
+          {
+            path: "assets/sound.mp3",
+            sha1: "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8",
           },
         ],
       },

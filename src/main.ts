@@ -339,7 +339,8 @@ export const linkAssets = async (
         .map((asset) => ({
           ...asset,
           path: path.relative(rp, asset.path).split(path.SEPARATOR).join("/"),
-        })),
+        }))
+        .sort((a, b) => a.path.localeCompare(b.path, "en")),
     );
   };
 

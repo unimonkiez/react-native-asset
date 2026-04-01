@@ -13,8 +13,13 @@ import getPlistPath from "./getPlistPath.js";
  *
  * Returns `null` if INFOPLIST_FILE is not specified or file is non-existent.
  */
-export default async function writePlist(project, sourceDir, plist) {
-  const plistPath = getPlistPath(project, sourceDir);
+export default async function writePlist(
+  project,
+  sourceDir,
+  plist,
+  targetUUID,
+) {
+  const plistPath = getPlistPath(project, sourceDir, targetUUID);
 
   if (!plistPath) {
     return null;

@@ -256,9 +256,7 @@ export const linkAssets = async (
     };
 
     const loadAll = async () => {
-      for (const p of assetsPaths) {
-        await loadAsset(p);
-      }
+      await Promise.all(assetsPaths.map((p) => loadAsset(p)));
       assets = clearDuplicated(assets);
     };
 
@@ -314,6 +312,7 @@ export const linkAssets = async (
             prevRelativeAssetsWithExt.map((x) => x.path)
           }`,
         );
+        // deno-lint-ignore no-await-in-loop -- sequential read/write to same plist file
         await cleanAssets(
           prevRelativeAssetsWithExt.map(({ path: filePath }) =>
             getAbsolute({ filePath, dirPath: rp })
@@ -325,6 +324,7 @@ export const linkAssets = async (
 
       if (assetsWithExt.length > 0) {
         console.info(`Linking ${fileConfigName} assets to ${name} project`);
+        // deno-lint-ignore no-await-in-loop -- sequential read/write to same plist file
         await copyAssets(
           assetsWithExt.map(({ path: assetPath }) => assetPath),
           platformConfig as { path: string; pbxprojPath: string },

@@ -17,10 +17,10 @@ jobs:
         with:
           deno-version: "2.6.3"
       - name: Format
-        run: make format-check
+        run: make fmt-check
       - name: Lint
         run: make lint
-      - name: Typecheck
-        run: make typecheck
+      - name: Check
+        run: make check
       - name: Test
         run: make test

@@ -16,6 +16,7 @@ export default async function cleanAssetsIos(
   createGroupWithMessage(project, "Resources");
 
   for (const targetUUID of getTargetUUIDs(project)) {
+    // deno-lint-ignore no-await-in-loop -- sequential read/write to same plist file
     const plist = await getPlist(project, platformConfig.path, targetUUID);
 
     const removedFiles = filePaths.map((p) => {
@@ -33,6 +34,7 @@ export default async function cleanAssetsIos(
       plist.UIAppFonts = Array.from(new Set(allFonts)); // use Set to dedupe w/existing
     }
 
+    // deno-lint-ignore no-await-in-loop
     await writePlist(project, platformConfig.path, plist, targetUUID);
   }
 

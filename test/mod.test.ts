@@ -2,6 +2,9 @@ import { assertEquals, assertStringIncludes } from "@std/assert";
 import { linkAssets } from "@unimonkiez/react-native-asset";
 import { setupLinkAssetsMocks } from "./test-tools.ts";
 import testProjectPbxproj from "./test_project.pbxproj" with { type: "text" };
+import testProjectMultiTargetPbxproj from "./test_project_multi_target.pbxproj" with {
+  type: "text",
+};
 import testInfoPlist from "./test_Info.plist" with { type: "text" };
 
 Deno.test("linkAssets test manifest creation and files handling for Android", async () => {
@@ -243,6 +246,86 @@ Deno.test("linkAssets test manifest creation and files handling for iOS with a f
     );
     assertStringIncludes(
       newTestInfoPlist,
+      "font.ttf",
+    );
+  } finally {
+    stubs.restore();
+  }
+});
+
+Deno.test("linkAssets links fonts to all iOS targets in the project", async () => {
+  const stubs = setupLinkAssetsMocks({
+    "ios": {
+      "HelloWorld.xcodeproj": {
+        "project.pbxproj": testProjectMultiTargetPbxproj,
+      },
+      "HelloWorld": {
+        "Info.plist": testInfoPlist,
+      },
+      "HelloWorldWidget": {
+        "Info.plist": testInfoPlist,
+      },
+    },
+    "assets": {
+      "font.ttf": "c",
+    },
+  });
+
+  try {
+    await linkAssets({
+      rootPath: ".",
+      platforms: {
+        android: {
+          enabled: false,
+          assets: [],
+        },
+        ios: {
+          enabled: true,
+          assets: ["assets"],
+        },
+      },
+    });
+
+    const manifest = JSON.parse(stubs.getFile(
+      "/ios/link-assets-manifest.json",
+    ));
+
+    assertEquals(
+      manifest,
+      {
+        migIndex: 1,
+        data: [
+          {
+            path: "assets/font.ttf",
+            sha1: "84a516841ba77a5b4648de2cd0dfcb30ea46dbb4",
+          },
+        ],
+      },
+    );
+
+    const newTestProjectPbxproj = stubs.getFile(
+      "/ios/HelloWorld.xcodeproj/project.pbxproj",
+    );
+    const newTestInfoPlistMainTarget = stubs.getFile(
+      "/ios/HelloWorld/Info.plist",
+    );
+    const newTestInfoPlistWidgetTarget = stubs.getFile(
+      "/ios/HelloWorldWidget/Info.plist",
+    );
+
+    // Font should be linked in the pbxproj
+    assertStringIncludes(
+      newTestProjectPbxproj,
+      "../assets/font.ttf",
+    );
+
+    // Font should be added to UIAppFonts in BOTH Info.plist files
+    assertStringIncludes(
+      newTestInfoPlistMainTarget,
+      "font.ttf",
+    );
+    assertStringIncludes(
+      newTestInfoPlistWidgetTarget,
       "font.ttf",
     );
   } finally {

@@ -1,15 +1,15 @@
 .PHONY: format format-check lint typecheck test
 
-format:
+fmt:
 	deno fmt
 
-format-check:
+fmt-check:
 	deno fmt --check
 
 lint:
 	deno lint
 
-typecheck:
+check:
 	deno check --unstable-raw-imports src/**/* test/**/*
 
 test:

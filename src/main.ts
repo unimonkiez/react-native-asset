@@ -285,9 +285,10 @@ export const linkAssets = async (
         options: otherOptions,
       });
 
-    await Promise.all(fileFilters.map(async (
-      { name: fileConfigName, filter: fileConfigFilter, options },
-    ) => {
+    for (
+      const { name: fileConfigName, filter: fileConfigFilter, options }
+        of fileFilters
+    ) {
       const prevRelativeAssetsWithExt = prevRelativeAssets
         .filter(fileConfigFilter)
         .filter(
@@ -311,6 +312,7 @@ export const linkAssets = async (
             prevRelativeAssetsWithExt.map((x) => x.path)
           }`,
         );
+        // deno-lint-ignore no-await-in-loop -- sequential read/write to same plist file
         await cleanAssets(
           prevRelativeAssetsWithExt.map(({ path: filePath }) =>
             getAbsolute({ filePath, dirPath: rp })
@@ -322,13 +324,14 @@ export const linkAssets = async (
 
       if (assetsWithExt.length > 0) {
         console.info(`Linking ${fileConfigName} assets to ${name} project`);
+        // deno-lint-ignore no-await-in-loop -- sequential read/write to same plist file
         await copyAssets(
           assetsWithExt.map(({ path: assetPath }) => assetPath),
           platformConfig as { path: string; pbxprojPath: string },
           options as { path: string } & { addFont: boolean },
         );
       }
-    }));
+    }
 
     await manifest.write(
       assets

@@ -2,6 +2,9 @@ import { assertEquals, assertStringIncludes } from "@std/assert";
 import { linkAssets } from "@unimonkiez/react-native-asset";
 import { setupLinkAssetsMocks } from "./test-tools.ts";
 import testProjectPbxproj from "./test_project.pbxproj" with { type: "text" };
+import testProjectMultiTargetPbxproj from "./test_project_multi_target.pbxproj" with {
+  type: "text",
+};
 import testInfoPlist from "./test_Info.plist" with { type: "text" };
 
 Deno.test("linkAssets test manifest creation and files handling for Android", async () => {

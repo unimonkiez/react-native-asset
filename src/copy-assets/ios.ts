@@ -26,18 +26,14 @@ export default async function copyAssetsIos(
 
   createGroupWithMessage(project, "Resources");
 
-  const plists = await Promise.all(
-    getTargetUUIDs(project).map((targetUUID) =>
-      getPlist(project, platformConfig.path, targetUUID)
-    ),
-  );
-
   await Promise.all(
-    plists.map((plist: unknown, i: number) => {
+    getTargetUUIDs(project).map(async (targetUUID) => {
+      const plist = await getPlist(project, platformConfig.path, targetUUID);
+
       const addedFiles = filePaths.map((p) =>
         project.addResourceFile(
           path.relative(platformConfig.path, p),
-          { target: getTargetUUIDs(project)[i] },
+          { target: targetUUID },
         )
       ).filter((x) => x).map((file: Record<string, unknown>) => file.basename);
 
@@ -50,11 +46,11 @@ export default async function copyAssetsIos(
         ); // use Set to dedupe w/existing
       }
 
-      return writePlist(
+      await writePlist(
         project,
         platformConfig.path,
         plist,
-        getTargetUUIDs(project)[i],
+        targetUUID,
       );
     }),
   );

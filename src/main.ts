@@ -286,7 +286,7 @@ export const linkAssets = async (
       });
 
     await Promise.all(fileFilters.map(async (
-      { name: fileConfigName, filter: fileConfigFilter, options }
+      { name: fileConfigName, filter: fileConfigFilter, options },
     ) => {
       const prevRelativeAssetsWithExt = prevRelativeAssets
         .filter(fileConfigFilter)

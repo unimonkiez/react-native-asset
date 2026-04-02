@@ -2,7 +2,8 @@ declare module "xcode" {
   type Project = {
     parseSync(): Project;
     writeSync(): string;
-    getFirstTarget(): { uuid: string };
+    pbxNativeTargetSection(): { [index: string]: unknown };
+    getFirstProject(): { firstProject: { targets: { value: string }[] } };
     addResourceFile(
       filePath: string,
       options: { target: string },

@@ -8,8 +8,8 @@
 import * as path from "@std/path";
 import getBuildProperty from "./getBuildProperty.js";
 
-export default function getPlistPath(project, sourceDir) {
-  const plistFile = getBuildProperty(project, "INFOPLIST_FILE");
+export default function getPlistPath(project, sourceDir, targetUUID) {
+  const plistFile = getBuildProperty(project, "INFOPLIST_FILE", targetUUID);
 
   if (!plistFile) {
     return null;

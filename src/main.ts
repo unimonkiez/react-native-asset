@@ -256,9 +256,7 @@ export const linkAssets = async (
     };
 
     const loadAll = async () => {
-      for (const p of assetsPaths) {
-        await loadAsset(p);
-      }
+      await Promise.all(assetsPaths.map((p) => loadAsset(p)));
       assets = clearDuplicated(assets);
     };
 
@@ -287,10 +285,9 @@ export const linkAssets = async (
         options: otherOptions,
       });
 
-    for (
-      const { name: fileConfigName, filter: fileConfigFilter, options }
-        of fileFilters
-    ) {
+    await Promise.all(fileFilters.map(async (
+      { name: fileConfigName, filter: fileConfigFilter, options }
+    ) => {
       const prevRelativeAssetsWithExt = prevRelativeAssets
         .filter(fileConfigFilter)
         .filter(
@@ -331,7 +328,7 @@ export const linkAssets = async (
           options as { path: string } & { addFont: boolean },
         );
       }
-    }
+    }));
 
     await manifest.write(
       assets

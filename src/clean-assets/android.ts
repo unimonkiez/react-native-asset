@@ -7,11 +7,11 @@ export default async function cleanAssetsAndroid(
 ) {
   console.log(`options path in cleanAssetsAndroid: ${options.path}`);
 
-  for (const p of filePaths) {
+  await Promise.all(filePaths.map(async (p) => {
     const target = path.join(options.path, path.basename(p));
     const st = await Deno.lstat(target);
     if (st.isFile) {
       await Deno.remove(target);
     }
-  }
+  }));
 }

@@ -16,7 +16,7 @@ export default async function cleanAssetsIos(
   createGroupWithMessage(project, "Resources");
 
   const targetUUIDs = getTargetUUIDs(project);
-  
+
   await Promise.all(
     targetUUIDs.map(async (targetUUID) => {
       const plist = await getPlist(project, platformConfig.path, targetUUID);
@@ -37,7 +37,7 @@ export default async function cleanAssetsIos(
       }
 
       await writePlist(project, platformConfig.path, plist, targetUUID);
-    })
+    }),
   );
 
   await Deno.writeTextFile(

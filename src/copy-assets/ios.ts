@@ -8,7 +8,7 @@ import getPlist from "../react-native-lib/ios/getPlist.js";
 import writePlist from "../react-native-lib/ios/writePlist.js";
 import { getTargetUUIDs } from "../utils.ts";
 
-export default async function cleanAssetsIos(
+export default async function copyAssetsIos(
   filePaths: string[],
   platformConfig: { path: string; pbxprojPath: string },
   options: { addFont: boolean },
@@ -26,33 +26,37 @@ export default async function cleanAssetsIos(
 
   createGroupWithMessage(project, "Resources");
 
-  const targetUUIDs = getTargetUUIDs(project);
   const plists = await Promise.all(
-    targetUUIDs.map((targetUUID) => getPlist(project, platformConfig.path, targetUUID))
+    getTargetUUIDs(project).map((targetUUID) =>
+      getPlist(project, platformConfig.path, targetUUID)
+    ),
   );
 
-  for (let i = 0; i < targetUUIDs.length; i++) {
-    const targetUUID = targetUUIDs[i];
-    const plist = plists[i];
-
-    const addedFiles = filePaths.map((p) =>
-      project.addResourceFile(
-        path.relative(platformConfig.path, p),
-        { target: targetUUID },
-      )
-    ).filter((x) => x).map((file) => file.basename);
-
-    if (options.addFont) {
-      const existingFonts = plist.UIAppFonts || [];
-      const allFonts = [...existingFonts, ...addedFiles];
-      plist.UIAppFonts = Array.from(new Set(allFonts)); // use Set to dedupe w/existing
-    }
-  }
-
   await Promise.all(
-    targetUUIDs.map((targetUUID, i) =>
-      writePlist(project, platformConfig.path, plists[i], targetUUID)
-    )
+    plists.map((plist: unknown, i: number) => {
+      const addedFiles = filePaths.map((p) =>
+        project.addResourceFile(
+          path.relative(platformConfig.path, p),
+          { target: getTargetUUIDs(project)[i] },
+        )
+      ).filter((x) => x).map((file: Record<string, unknown>) => file.basename);
+
+      if (options.addFont) {
+        const existingFonts =
+          ((plist as Record<string, unknown>).UIAppFonts as string[]) || [];
+        const allFonts = [...existingFonts, ...addedFiles];
+        (plist as Record<string, unknown>).UIAppFonts = Array.from(
+          new Set(allFonts),
+        ); // use Set to dedupe w/existing
+      }
+
+      return writePlist(
+        project,
+        platformConfig.path,
+        plist,
+        getTargetUUIDs(project)[i],
+      );
+    }),
   );
 
   await Deno.writeTextFile(

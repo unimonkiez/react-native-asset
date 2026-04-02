@@ -25,21 +25,22 @@ export default async function copyAssetsIos(
   );
 
   createGroupWithMessage(project, "Resources");
+  const fileBasenames = filePaths.map((p) => path.basename(p));
 
   for (const targetUUID of getTargetUUIDs(project)) {
     // deno-lint-ignore no-await-in-loop -- sequential read/write to same plist file
     const plist = await getPlist(project, platformConfig.path, targetUUID);
 
-    const addedFiles = filePaths.map((p) =>
+    for (const filePath of filePaths) {
       project.addResourceFile(
-        path.relative(platformConfig.path, p),
+        path.relative(platformConfig.path, filePath),
         { target: targetUUID },
-      )
-    ).filter((x) => x).map((file) => file.basename);
+      );
+    }
 
-    if (options.addFont) {
+    if (options.addFont && plist) {
       const existingFonts = plist.UIAppFonts || [];
-      const allFonts = [...existingFonts, ...addedFiles];
+      const allFonts = [...existingFonts, ...fileBasenames];
       plist.UIAppFonts = Array.from(new Set(allFonts)); // use Set to dedupe w/existing
     }
 

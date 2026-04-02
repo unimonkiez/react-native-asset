@@ -1,8 +1,10 @@
 import * as path from "@std/path";
-/// <reference types="../xcode.d.ts" />
+// @deno-types="../xcode.d.ts"
 import * as xcode from "xcode";
-/// <reference types="../xcode.d.ts" />
-import * as xcodeParser from "xcode/lib/parser/pbxproj.js";
+import type { parse } from "../xcode.d.ts";
+import * as xcodeParserUntyped from "xcode/lib/parser/pbxproj.js";
+
+const xcodeParser = xcodeParserUntyped as { parse: typeof parse };
 import createGroupWithMessage from "../react-native-lib/ios/createGroupWithMessage.js";
 import getPlist from "../react-native-lib/ios/getPlist.js";
 import writePlist from "../react-native-lib/ios/writePlist.js";

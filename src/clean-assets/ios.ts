@@ -15,26 +15,30 @@ export default async function cleanAssetsIos(
 
   createGroupWithMessage(project, "Resources");
 
-  for (const targetUUID of getTargetUUIDs(project)) {
-    const plist = await getPlist(project, platformConfig.path, targetUUID);
+  const targetUUIDs = getTargetUUIDs(project);
+  
+  await Promise.all(
+    targetUUIDs.map(async (targetUUID) => {
+      const plist = await getPlist(project, platformConfig.path, targetUUID);
 
-    const removedFiles = filePaths.map((p) => {
-      return project.removeResourceFile(
-        path.relative(platformConfig.path, p),
-        { target: targetUUID },
-      );
-    }).filter((x) => x).map((file) => file.basename);
+      const removedFiles = filePaths.map((p) => {
+        return project.removeResourceFile(
+          path.relative(platformConfig.path, p),
+          { target: targetUUID },
+        );
+      }).filter((x) => x).map((file) => file.basename);
 
-    if (options.addFont) {
-      const existingFonts = plist.UIAppFonts || [];
-      const allFonts = existingFonts.filter((file: string) =>
-        removedFiles.indexOf(file) === -1
-      );
-      plist.UIAppFonts = Array.from(new Set(allFonts)); // use Set to dedupe w/existing
-    }
+      if (options.addFont) {
+        const existingFonts = plist.UIAppFonts || [];
+        const allFonts = existingFonts.filter((file: string) =>
+          removedFiles.indexOf(file) === -1
+        );
+        plist.UIAppFonts = Array.from(new Set(allFonts)); // use Set to dedupe w/existing
+      }
 
-    await writePlist(project, platformConfig.path, plist, targetUUID);
-  }
+      await writePlist(project, platformConfig.path, plist, targetUUID);
+    })
+  );
 
   await Deno.writeTextFile(
     platformConfig.pbxprojPath,

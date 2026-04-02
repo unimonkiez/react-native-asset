@@ -26,8 +26,14 @@ export default async function cleanAssetsIos(
 
   createGroupWithMessage(project, "Resources");
 
-  for (const targetUUID of getTargetUUIDs(project)) {
-    const plist = await getPlist(project, platformConfig.path, targetUUID);
+  const targetUUIDs = getTargetUUIDs(project);
+  const plists = await Promise.all(
+    targetUUIDs.map((targetUUID) => getPlist(project, platformConfig.path, targetUUID))
+  );
+
+  for (let i = 0; i < targetUUIDs.length; i++) {
+    const targetUUID = targetUUIDs[i];
+    const plist = plists[i];
 
     const addedFiles = filePaths.map((p) =>
       project.addResourceFile(
@@ -41,9 +47,13 @@ export default async function cleanAssetsIos(
       const allFonts = [...existingFonts, ...addedFiles];
       plist.UIAppFonts = Array.from(new Set(allFonts)); // use Set to dedupe w/existing
     }
-
-    await writePlist(project, platformConfig.path, plist, targetUUID);
   }
+
+  await Promise.all(
+    targetUUIDs.map((targetUUID, i) =>
+      writePlist(project, platformConfig.path, plists[i], targetUUID)
+    )
+  );
 
   await Deno.writeTextFile(
     platformConfig.pbxprojPath,

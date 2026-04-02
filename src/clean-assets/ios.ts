@@ -15,10 +15,8 @@ export default async function cleanAssetsIos(
 
   createGroupWithMessage(project, "Resources");
 
-  const targetUUIDs = getTargetUUIDs(project);
-
   await Promise.all(
-    targetUUIDs.map(async (targetUUID) => {
+    getTargetUUIDs(project).map(async (targetUUID) => {
       const plist = await getPlist(project, platformConfig.path, targetUUID);
 
       const removedFiles = filePaths.map((p) => {

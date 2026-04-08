@@ -1,6 +1,10 @@
 import * as path from "@std/path";
 // @deno-types="../xcode.d.ts"
 import * as xcode from "xcode";
+import type { parse } from "../xcode.d.ts";
+import * as xcodeParserUntyped from "xcode/lib/parser/pbxproj.js";
+
+const xcodeParser = xcodeParserUntyped as { parse: typeof parse };
 import createGroupWithMessage from "../react-native-lib/ios/createGroupWithMessage.js";
 import getPlist from "../react-native-lib/ios/getPlist.js";
 import writePlist from "../react-native-lib/ios/writePlist.js";
@@ -11,7 +15,11 @@ export default async function cleanAssetsIos(
   platformConfig: { path: string; pbxprojPath: string },
   options: { addFont: boolean },
 ) {
-  const project = xcode.project(platformConfig.pbxprojPath).parseSync();
+  const project = xcode.project(platformConfig.pbxprojPath);
+  const pbxprojContent = await Deno.readFile(platformConfig.pbxprojPath).then(
+    (buf) => new TextDecoder("utf-8").decode(buf),
+  );
+  project.hash = xcodeParser.parse(pbxprojContent);
 
   createGroupWithMessage(project, "Resources");
 

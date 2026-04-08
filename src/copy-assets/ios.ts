@@ -17,16 +17,12 @@ export default async function copyAssetsIos(
 ) {
   const project = xcode.project(platformConfig.pbxprojPath);
   const pbxprojContent = await Deno.readFile(platformConfig.pbxprojPath).then(
-    (buf) => {
-      const decoder = new TextDecoder("utf-8");
-      return decoder.decode(buf);
-    },
+    (buf) => new TextDecoder("utf-8").decode(buf),
   );
-  project.hash = xcodeParser.parse(
-    pbxprojContent,
-  );
+  project.hash = xcodeParser.parse(pbxprojContent);
 
   createGroupWithMessage(project, "Resources");
+
   const fileBasenames = filePaths.map((p) => path.basename(p));
 
   for (const targetUUID of getTargetUUIDs(project)) {

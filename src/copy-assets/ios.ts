@@ -1,7 +1,7 @@
 import * as path from "@std/path";
 // @deno-types="../xcode.d.ts"
 import * as xcode from "xcode";
-import type { parse } from "../xcode.d.ts";
+import type { parse, PBXFile } from "../xcode.d.ts";
 import * as xcodeParserUntyped from "xcode/lib/parser/pbxproj.js";
 
 const xcodeParser = xcodeParserUntyped as { parse: typeof parse };
@@ -23,18 +23,42 @@ export default async function copyAssetsIos(
 
   createGroupWithMessage(project, "Resources");
 
+  const targetUUIDs = getTargetUUIDs(project);
+
+  for (const filePath of filePaths) {
+    const relativeFilePath = path.relative(platformConfig.path, filePath);
+
+    let file: PBXFile | false = false;
+    for (const target of targetUUIDs) {
+      if (!file) {
+        file = project.addResourceFile(relativeFilePath, { target });
+        if (!file) {
+          // We know the file already exists but there's no obvious way to get the PBXFile reference
+          // It's kinda sloppy but we can remove and re-add the resource to get the reference
+          // This has the side effect of unlinking all other targets... not a problem because we're about to link them anyway
+          project.removeResourceFile(relativeFilePath, { target });
+          file = project.addResourceFile(relativeFilePath, { target });
+          if (!file) {
+            throw new Error(`Failed to add file to pbxproj "${filePath}"`);
+          }
+        }
+      } else {
+        file.target = target;
+        project.addToPbxResourcesBuildPhase(file);
+      }
+    }
+  }
+
+  await Deno.writeTextFile(
+    platformConfig.pbxprojPath,
+    project.writeSync(),
+  );
+
   const fileBasenames = filePaths.map((p) => path.basename(p));
 
-  for (const targetUUID of getTargetUUIDs(project)) {
+  for (const targetUUID of targetUUIDs) {
     // deno-lint-ignore no-await-in-loop -- sequential read/write to same plist file
     const plist = await getPlist(project, platformConfig.path, targetUUID);
-
-    for (const filePath of filePaths) {
-      project.addResourceFile(
-        path.relative(platformConfig.path, filePath),
-        { target: targetUUID },
-      );
-    }
 
     if (options.addFont && plist) {
       const existingFonts = plist.UIAppFonts || [];
@@ -45,9 +69,4 @@ export default async function copyAssetsIos(
     // deno-lint-ignore no-await-in-loop -- sequential read/write to same plist file
     await writePlist(project, platformConfig.path, plist, targetUUID);
   }
-
-  await Deno.writeTextFile(
-    platformConfig.pbxprojPath,
-    project.writeSync(),
-  );
 }

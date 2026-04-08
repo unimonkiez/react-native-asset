@@ -5,6 +5,9 @@ import testProjectPbxproj from "./test_project.pbxproj" with { type: "text" };
 import testProjectMultiTargetPbxproj from "./test_project_multi_target.pbxproj" with {
   type: "text",
 };
+import testProjectUnlinkedTargetPbxproj from "./test_project_unlinked_target.pbxproj" with {
+  type: "text",
+};
 import testInfoPlist from "./test_Info.plist" with { type: "text" };
 
 Deno.test("linkAssets test manifest creation and files handling for Android", async () => {
@@ -327,10 +330,9 @@ Deno.test("linkAssets links fonts to all iOS targets in the project", async () =
         "/* End PBXResourcesBuildPhase section */",
       ),
     );
-    const occurrencesOfFont = resourcesBuildPhase.split("font.ttf").length - 1;
 
     // Font should be in the resources build phase twice (once for each target)
-    assertEquals(occurrencesOfFont, 2);
+    assertEquals(resourcesBuildPhase.split("font.ttf").length - 1, 2);
 
     // Font should be added to UIAppFonts in BOTH Info.plist files
     assertStringIncludes(
@@ -373,12 +375,6 @@ Deno.test("linkAssets links fonts to all iOS targets in the project", async () =
     const newTestProjectPbxprojAfterRemove = stubs.getFile(
       "/ios/HelloWorld.xcodeproj/project.pbxproj",
     );
-    const newTestInfoPlistMainTargetAfterRemove = stubs.getFile(
-      "/ios/HelloWorld/Info.plist",
-    );
-    const newTestInfoPlistWidgetTargetAfterRemove = stubs.getFile(
-      "/ios/HelloWorldWidget/Info.plist",
-    );
 
     // Font should NOT be linked in the pbxproj
     assertEquals(
@@ -399,12 +395,98 @@ Deno.test("linkAssets links fonts to all iOS targets in the project", async () =
     // Font should NOT be in the resources build phase
     assertEquals(resourcesBuildPhaseAfterRemove.indexOf("font.ttf"), -1);
 
+    const newTestInfoPlistMainTargetAfterRemove = stubs.getFile(
+      "/ios/HelloWorld/Info.plist",
+    );
+    const newTestInfoPlistWidgetTargetAfterRemove = stubs.getFile(
+      "/ios/HelloWorldWidget/Info.plist",
+    );
+
     // Font should NOT be in UIAppFonts in EITHER Info.plist file
     assertEquals(newTestInfoPlistMainTargetAfterRemove.indexOf("font.ttf"), -1);
     assertEquals(
       newTestInfoPlistWidgetTargetAfterRemove.indexOf("font.ttf"),
       -1,
     );
+  } finally {
+    stubs.restore();
+  }
+});
+
+Deno.test("linkAssets recovers from partially linked iOS targets in the project", async () => {
+  const stubs = setupLinkAssetsMocks({
+    "ios": {
+      "HelloWorld.xcodeproj": {
+        "project.pbxproj": testProjectMultiTargetPbxproj,
+      },
+      "HelloWorld": {
+        "Info.plist": testInfoPlist,
+      },
+      "HelloWorldWidget": {
+        "Info.plist": testInfoPlist,
+      },
+    },
+    "assets": {
+      "sound.mp3": "a",
+      "image.png": "b",
+      "font.ttf": "c",
+    },
+  });
+
+  try {
+    const initialResourcesBuildPhase = testProjectUnlinkedTargetPbxproj.slice(
+      testProjectUnlinkedTargetPbxproj.indexOf(
+        "/* Begin PBXResourcesBuildPhase section */",
+      ),
+      testProjectUnlinkedTargetPbxproj.indexOf(
+        "/* End PBXResourcesBuildPhase section */",
+      ),
+    );
+    const numberOfTargets =
+      initialResourcesBuildPhase.split("/* Resources */").length - 1;
+
+    // Verify the test is set up correctly (2 targets, only one of which is linked)
+    assertEquals(numberOfTargets, 2);
+    assertEquals(initialResourcesBuildPhase.split("sound.mp3").length - 1, 1);
+    assertEquals(initialResourcesBuildPhase.split("image.png").length - 1, 1);
+    assertEquals(initialResourcesBuildPhase.split("font.ttf").length - 1, 1);
+
+    await linkAssets({
+      rootPath: ".",
+      platforms: {
+        android: {
+          enabled: false,
+          assets: [],
+        },
+        ios: {
+          enabled: true,
+          assets: ["assets"],
+        },
+      },
+    });
+
+    const newTestProjectPbxproj = stubs.getFile(
+      "/ios/HelloWorld.xcodeproj/project.pbxproj",
+    );
+
+    // Assets should still be linked in the pbxproj
+    assertStringIncludes(newTestProjectPbxproj, "../assets/sound.mp3");
+    assertStringIncludes(newTestProjectPbxproj, "../assets/image.png");
+    assertStringIncludes(newTestProjectPbxproj, "../assets/font.ttf");
+
+    const resourcesBuildPhase = newTestProjectPbxproj.slice(
+      newTestProjectPbxproj.indexOf(
+        "/* Begin PBXResourcesBuildPhase section */",
+      ),
+      newTestProjectPbxproj.indexOf(
+        "/* End PBXResourcesBuildPhase section */",
+      ),
+    );
+
+    // Assets should be in the resources build phase twice (once for each target)
+    assertEquals(resourcesBuildPhase.split("sound.mp3").length - 1, 2);
+    assertEquals(resourcesBuildPhase.split("image.png").length - 1, 2);
+    assertEquals(resourcesBuildPhase.split("font.ttf").length - 1, 2);
   } finally {
     stubs.restore();
   }

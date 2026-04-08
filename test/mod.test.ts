@@ -69,7 +69,7 @@ Deno.test("linkAssets test manifest creation and files handling for Android", as
       "/android/app/src/main/assets/fonts/font.ttf",
     );
 
-    stubs.removeFile("/assets/sound.mp3");
+    await stubs.removeFile("/assets/sound.mp3");
     await linkAssets({
       rootPath: ".",
       platforms: {
@@ -319,6 +319,19 @@ Deno.test("linkAssets links fonts to all iOS targets in the project", async () =
       "../assets/font.ttf",
     );
 
+    const resourcesBuildPhase = newTestProjectPbxproj.slice(
+      newTestProjectPbxproj.indexOf(
+        "/* Begin PBXResourcesBuildPhase section */",
+      ),
+      newTestProjectPbxproj.indexOf(
+        "/* End PBXResourcesBuildPhase section */",
+      ),
+    );
+    const occurrencesOfFont = resourcesBuildPhase.split("font.ttf").length - 1;
+
+    // Font should be in the resources build phase twice (once for each target)
+    assertEquals(occurrencesOfFont, 2);
+
     // Font should be added to UIAppFonts in BOTH Info.plist files
     assertStringIncludes(
       newTestInfoPlistMainTarget,
@@ -327,6 +340,70 @@ Deno.test("linkAssets links fonts to all iOS targets in the project", async () =
     assertStringIncludes(
       newTestInfoPlistWidgetTarget,
       "font.ttf",
+    );
+
+    // Remove font asset
+    await stubs.removeFile("/assets/font.ttf");
+    await linkAssets({
+      rootPath: ".",
+      platforms: {
+        android: {
+          enabled: false,
+          assets: [],
+        },
+        ios: {
+          enabled: true,
+          assets: ["assets"],
+        },
+      },
+    });
+
+    const manifestAfterRemove = JSON.parse(stubs.getFile(
+      "/ios/link-assets-manifest.json",
+    ));
+
+    assertEquals(
+      manifestAfterRemove,
+      {
+        migIndex: 1,
+        data: [],
+      },
+    );
+
+    const newTestProjectPbxprojAfterRemove = stubs.getFile(
+      "/ios/HelloWorld.xcodeproj/project.pbxproj",
+    );
+    const newTestInfoPlistMainTargetAfterRemove = stubs.getFile(
+      "/ios/HelloWorld/Info.plist",
+    );
+    const newTestInfoPlistWidgetTargetAfterRemove = stubs.getFile(
+      "/ios/HelloWorldWidget/Info.plist",
+    );
+
+    // Font should NOT be linked in the pbxproj
+    assertEquals(
+      newTestProjectPbxprojAfterRemove.indexOf("../assets/font.ttf"),
+      -1,
+    );
+
+    const resourcesBuildPhaseAfterRemove = newTestProjectPbxprojAfterRemove
+      .slice(
+        newTestProjectPbxprojAfterRemove.indexOf(
+          "/* Begin PBXResourcesBuildPhase section */",
+        ),
+        newTestProjectPbxprojAfterRemove.indexOf(
+          "/* End PBXResourcesBuildPhase section */",
+        ),
+      );
+
+    // Font should NOT be in the resources build phase
+    assertEquals(resourcesBuildPhaseAfterRemove.indexOf("font.ttf"), -1);
+
+    // Font should NOT be in UIAppFonts in EITHER Info.plist file
+    assertEquals(newTestInfoPlistMainTargetAfterRemove.indexOf("font.ttf"), -1);
+    assertEquals(
+      newTestInfoPlistWidgetTargetAfterRemove.indexOf("font.ttf"),
+      -1,
     );
   } finally {
     stubs.restore();

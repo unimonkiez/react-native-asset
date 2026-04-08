@@ -33,7 +33,7 @@ export default async function copyAssetsIos(
       if (!file) {
         file = project.addResourceFile(relativeFilePath, { target });
         if (!file) {
-          // We know the file already exists but there's no obvious way to get the PBXFile reference
+          // We know the resource is already in the project but there's no obvious way to get the PBXFile reference
           // It's kinda sloppy but we can remove and re-add the resource to get the reference
           // This has the side effect of unlinking all other targets... not a problem because we're about to link them anyway
           project.removeResourceFile(relativeFilePath, { target });

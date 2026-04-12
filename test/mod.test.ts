@@ -417,7 +417,7 @@ Deno.test("linkAssets recovers from partially linked iOS targets in the project"
   const stubs = setupLinkAssetsMocks({
     "ios": {
       "HelloWorld.xcodeproj": {
-        "project.pbxproj": testProjectMultiTargetPbxproj,
+        "project.pbxproj": testProjectUnlinkedTargetPbxproj,
       },
       "HelloWorld": {
         "Info.plist": testInfoPlist,
@@ -434,11 +434,14 @@ Deno.test("linkAssets recovers from partially linked iOS targets in the project"
   });
 
   try {
-    const initialResourcesBuildPhase = testProjectUnlinkedTargetPbxproj.slice(
-      testProjectUnlinkedTargetPbxproj.indexOf(
+    const testProjectPbxproj = stubs.getFile(
+      "/ios/HelloWorld.xcodeproj/project.pbxproj",
+    );
+    const initialResourcesBuildPhase = testProjectPbxproj.slice(
+      testProjectPbxproj.indexOf(
         "/* Begin PBXResourcesBuildPhase section */",
       ),
-      testProjectUnlinkedTargetPbxproj.indexOf(
+      testProjectPbxproj.indexOf(
         "/* End PBXResourcesBuildPhase section */",
       ),
     );

@@ -2,6 +2,7 @@ export type PBXFile = {
   basename: string;
   path: string;
   target?: string;
+  uuid: string;
 };
 
 export type PBXProject = {
@@ -13,11 +14,13 @@ export type PBXProject = {
     filePath: string,
     options: { target: string },
   ): PBXFile | false;
+  addToPbxBuildFileSection(file: PBXFile): void;
   addToPbxResourcesBuildPhase(file: PBXFile): void;
   removeResourceFile(
     filePath: string,
     options: { target: string },
   ): PBXFile;
+  generateUuid(): string;
   hash: string;
 };
 

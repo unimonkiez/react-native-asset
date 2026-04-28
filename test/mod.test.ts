@@ -1,4 +1,8 @@
-import { assertEquals, assertStringIncludes } from "@std/assert";
+import {
+  assertEquals,
+  assertNotEquals,
+  assertStringIncludes,
+} from "@std/assert";
 import { linkAssets } from "@unimonkiez/react-native-asset";
 import { setupLinkAssetsMocks } from "./test-tools.ts";
 import testProjectPbxproj from "./test_project.pbxproj" with { type: "text" };
@@ -322,6 +326,34 @@ Deno.test("linkAssets links fonts to all iOS targets in the project", async () =
       "../assets/font.ttf",
     );
 
+    const buildFileSection = newTestProjectPbxproj.slice(
+      newTestProjectPbxproj.indexOf(
+        "/* Begin PBXBuildFile section */",
+      ),
+      newTestProjectPbxproj.indexOf(
+        "/* End PBXBuildFile section */",
+      ),
+    );
+    const buildFileSectionLinesWithFont = buildFileSection.split("\n")
+      .filter((s) => s.includes("font.ttf"));
+
+    // Font should be in the build file section twice (once for each target)
+    assertEquals(buildFileSectionLinesWithFont.length, 2);
+
+    const fileReferenceSection = newTestProjectPbxproj.slice(
+      newTestProjectPbxproj.indexOf(
+        "/* Begin PBXFileReference section */",
+      ),
+      newTestProjectPbxproj.indexOf(
+        "/* End PBXFileReference section */",
+      ),
+    );
+    const fileReferenceSectionLinesWithFont = fileReferenceSection.split("\n")
+      .filter((s) => s.includes("font.ttf"));
+
+    // Font should be in the file reference section once
+    assertEquals(fileReferenceSectionLinesWithFont.length, 1);
+
     const resourcesBuildPhase = newTestProjectPbxproj.slice(
       newTestProjectPbxproj.indexOf(
         "/* Begin PBXResourcesBuildPhase section */",
@@ -330,9 +362,17 @@ Deno.test("linkAssets links fonts to all iOS targets in the project", async () =
         "/* End PBXResourcesBuildPhase section */",
       ),
     );
+    const resourcesBuildPhaseLinesWithFont = resourcesBuildPhase.split("\n")
+      .filter((s) => s.includes("font.ttf"));
 
     // Font should be in the resources build phase twice (once for each target)
-    assertEquals(resourcesBuildPhase.split("font.ttf").length - 1, 2);
+    assertEquals(resourcesBuildPhaseLinesWithFont.length, 2);
+
+    const firstUuid = resourcesBuildPhaseLinesWithFont[0].slice(4, 28);
+    const secondUuid = resourcesBuildPhaseLinesWithFont[1].slice(4, 28);
+
+    // Font should have different UUID in each build phase
+    assertNotEquals(firstUuid, secondUuid);
 
     // Font should be added to UIAppFonts in BOTH Info.plist files
     assertStringIncludes(

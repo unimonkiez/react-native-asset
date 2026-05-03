@@ -43,7 +43,10 @@ export default async function copyAssetsIos(
           }
         }
       } else {
+        // Each target & asset combination needs a different build phase UUID
         file.target = target;
+        file.uuid = project.generateUuid();
+        project.addToPbxBuildFileSection(file);
         project.addToPbxResourcesBuildPhase(file);
       }
     }
